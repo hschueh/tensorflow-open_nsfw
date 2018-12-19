@@ -1,3 +1,10 @@
+# Purpose
+A simple service that take imgur url as input, NSFW score as output.
+Used in my side project, [Beauty Bomb](https://play.google.com/store/apps/details?id=com.gonnaggstudio.beautybomb.full). In order to filter those inappropriate content.
+
+Original readme below.
+---------------------------------------
+
 # Tensorflow Implementation of Yahoo's Open NSFW Model
 
 This repository contains an implementation of [Yahoo's Open NSFW Classifier](https://github.com/yahoo/open_nsfw) rewritten in tensorflow.
