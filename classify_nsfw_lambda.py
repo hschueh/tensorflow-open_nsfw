@@ -3,6 +3,7 @@ import sys
 import requests
 import json
 import os
+import subprocess
 import tensorflow as tf
 
 from model import OpenNsfwModel, InputType
@@ -21,7 +22,7 @@ def classify_nsfw_lambda(imgs):
     with tf.Session() as sess:
 
         def classity_nsfw(url):
-            if 'jpg' not in url or '/a/' in url:
+            if '/a/' in url:
                 return -1
             print("Downloading from '{}'".format(url))
             local_filename = url.split('/')[-1]
@@ -31,6 +32,20 @@ def classify_nsfw_lambda(imgs):
                     for chunk in r.iter_content(chunk_size=1024): 
                         if chunk: # filter out keep-alive new chunks
                             f.write(chunk)
+                if '.gif' in local_filename:
+                    print("gif found")
+                    local_filename_gif = local_filename
+                    local_filename = local_filename.replace('.gif', '.jpg')
+                    print('calling convert {gif}[0] {jpg}'.format(gif=local_filename_gif, jpg=local_filename))
+                    ret = subprocess.call('convert {gif}[0] {jpg}'.format(gif=local_filename_gif, jpg=local_filename), shell=True)
+                    print('output: {}'.format(ret))
+                elif '.png' in local_filename:
+                    print("png found")
+                    local_filename_png = local_filename
+                    local_filename = local_filename.replace('.png', '.jpg')
+                    print('convert {png} {jpg}'.format(png=local_filename_png, jpg=local_filename))
+                    ret = subprocess.call('convert {png} {jpg}'.format(png=local_filename_png, jpg=local_filename), shell=True)
+                    print('output: {}'.format(ret))
                 image = fn_load_image(local_filename)
                 predictions = \
                     sess.run(model.predictions,
@@ -66,4 +81,4 @@ def classify_nsfw_lambda(imgs):
 
 
 if __name__ == "__main__":
-    print(str(classify_nsfw_lambda(["http://i.imgur.com/ypZm0KB.jpg","http://i.imgur.com/gHGY33o.jpg"])))
+    print(str(classify_nsfw_lambda(["https://i.imgur.com/00Z4qKF.gif","https://i.imgur.com/51q6feG.gif"])))
