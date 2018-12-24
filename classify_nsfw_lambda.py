@@ -24,6 +24,8 @@ def classify_nsfw_lambda(imgs):
         def classity_nsfw(url):
             if '/a/' in url:
                 return -1
+            if not (url.endswith(".gif") or url.endswith(".jpg") or url.endswith(".png")):
+                return -1
             print("Downloading from '{}'".format(url))
             local_filename = url.split('/')[-1]
             try:
@@ -64,9 +66,11 @@ def classify_nsfw_lambda(imgs):
                 print("FIle Not Found Err")
                 return -1
             finally:
-                if os.path.isfile(local_filename):
-                    os.remove(local_filename)
-
+                dir_name = os.getcwd()
+                test = os.listdir(dir_name)
+                for item in test:
+                    if item.endswith(".gif") or item.endswith(".jpg") or item.endswith(".png"):
+                        os.remove(os.path.join(dir_name, item))
         model.build(weights_path='data/open_nsfw-weights.npy', input_type=InputType[InputType.TENSOR.name.upper()])
 
         fn_load_image = create_tensorflow_image_loader(sess)
